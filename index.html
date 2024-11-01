@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telephone Number Validator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1a73e8;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            transition: border-color 0.3s;
+        }
+
+        #user-input:focus {
+            outline: none;
+            border-color: #1a73e8;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        #check-btn {
+            background-color: #1a73e8;
+            color: white;
+        }
+
+        #check-btn:hover {
+            background-color: #1557b0;
+        }
+
+        #clear-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        #clear-btn:hover {
+            background-color: #bb2d3b;
+        }
+
+        #results-div {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .valid {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .invalid {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Telephone Number Validator</h1>
+        <div class="input-section">
+            <input type="text" id="user-input" placeholder="Enter phone number">
+            <button id="check-btn">Check</button>
+            <button id="clear-btn">Clear</button>
+        </div>
+        <div id="results-div" class="hidden"></div>
+    </div>
+
+    <script>
+        const userInput = document.getElementById('user-input');
+        const checkBtn = document.getElementById('check-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const resultsDiv = document.getElementById('results-div');
+
+        function validatePhoneNumber(phoneNumber) {
+            // Remove all whitespace first to make pattern matching easier
+            const cleanNumber = phoneNumber.trim();
+            
+            // Regular expression to match valid US phone number formats
+            const phoneRegex = /^(1\s?)?(\(\d{3}\)|\d{3})[-\s]?(\d{3})[-\s]?(\d{4})$/;
+            
+            // Additional checks for invalid formats
+            const invalidPatterns = [
+                /^\d{1,9}$/, // Less than 10 digits
+                /^[2-9]/, // Starts with anything other than 1 or area code
+                /^\(\d{3}\)\)/, // Double closing parenthesis
+                /\(\d{3}\)\d{3}\)\d{4}/, // Multiple parenthesis groups
+                /[a-zA-Z]/, // Contains letters
+                /[*&!#]/, // Contains special characters
+                /^1[2-9]/, // Country code other than 1
+                /^0/, // Starts with 0
+                /^-/, // Starts with -
+                /^10/, // Starts with 10
+                /\(\d{3}$/, // Unclosed parenthesis
+                /^\)\d{3}/, // Starting with closing parenthesis
+                /\?\)/, // Contains question mark and parenthesis
+                /^\d{2}\s\d{2}/, // Invalid grouping of numbers
+            ];
+
+            // Check for invalid patterns first
+            for (const pattern of invalidPatterns) {
+                if (pattern.test(cleanNumber)) {
+                    return false;
+                }
+            }
+
+            // Check if the number matches the valid format
+            return phoneRegex.test(cleanNumber);
+        }
+
+        function displayResult(input) {
+            const isValid = validatePhoneNumber(input);
+            resultsDiv.textContent = `${isValid ? 'Valid' : 'Invalid'} US number: ${input}`;
+            resultsDiv.className = isValid ? 'valid' : 'invalid';
+            resultsDiv.classList.remove('hidden');
+        }
+
+        checkBtn.addEventListener('click', () => {
+            const input = userInput.value.trim();
+            if (!input) {
+                alert('Please provide a phone number');
+                return;
+            }
+            displayResult(input);
+        });
+
+        clearBtn.addEventListener('click', () => {
+            userInput.value = '';
+            resultsDiv.textContent = '';
+            resultsDiv.className = 'hidden';
+        });
+
+        // Add keyboard support for better accessibility
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
